@@ -6,7 +6,7 @@
  *
  * Examples:
  *   node scripts/list-files.mjs
- *   node scripts/list-files.mjs D:\workspace\DSH\dsh-session-color 4
+ *   node scripts/list-files.mjs D:\workspace\DSH\dsh_ux_enhance 4
  *
  * The script prints a JSON tree to stdout. It skips common heavy/hidden
  * directories (node_modules, .git, dist, build) and hidden entries.
