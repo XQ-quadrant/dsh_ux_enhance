@@ -12,8 +12,8 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 ### 1. PC 版布局优化
 - 加宽消息列（748px → 900px）
 - 改为左右两栏布局：左侧消息流，右侧输入框 + 统计区
-- 悬浮「跳到底部」按钮，不丢上下文
-- 工作区文件目录面板（PC 端显示于输入框右侧）
+- 悬浮「跳到底部」按钮（`shell.overlay` 浮层槽），不丢上下文
+- 工作区文件目录面板（`conversation.input.dock` 槽，输入框上方）
 
 ![PC效果](PC效果.png)
 
@@ -25,10 +25,10 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 ![手机效果1](手机效果1.png)
 ![手机效果2](手机效果2.png)
 
-### 3. 侧边栏会话颜色
-- 会话行「⋯」菜单注入「设置颜色」入口
+### 3. 会话颜色
+- 会话头部动作槽（`conversation.session.header.actions`）注册色板入口
 - 10 种预设色 + 清除按钮
-- 颜色存入 `localStorage`，浏览器重启后保留
+- 颜色存入框架 `defineStore({ persist })` 会话级 store，会话删除自动清理
 
 ### 4. 音效提示
 - **完成音**：`running` true → false（每轮对话跑完），上行双音「叮-咚」
@@ -37,8 +37,10 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 可通过 `localStorage` 开关或调节音量（`dsh.soundAlert.v1`）
 
 ### 5. 工作区文件目录面板
-- PC 端右侧栏显示工作区文件树（如 DSH 上下文提供 `workspace/project/files` API）
+- `conversation.input.dock` 槽组件，数据来自官方 `ctx.workspaces.listDirectory`
+- 懒加载展开目录，行内「打开」调用 `openPath` 在系统文件管理器中打开
 - 手机端自动隐藏，不干扰主流程
+- 注：宿主 `listDirectory` 只返回目录（浏览能力跳过文件），因此这是目录树
 
 ---
 
@@ -52,7 +54,9 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
   prop 直接传入，不再靠 DOM 文本反查。
 - 音效模块订阅 `ctx.sessions.list`，对每个会话做状态 diff，只对**状态跳变**发声；
   开关/音量由框架 store 持久化（`dsh.soundAlert.v1`）。
-- 布局/移动端适配仍为样式层注入（依赖构建期哈希类名，见「已知限制」）。
+- 跳底按钮注册进 `shell.overlay`（浮层槽），工作区目录树注册进
+  `conversation.input.dock`（数据走 `ctx.workspaces.listDirectory`）。
+- 两栏布局/手机适配仍为样式层注入（依赖构建期哈希类名，见「已知限制」）。
 
 ## 目录结构
 
@@ -126,6 +130,8 @@ localStorage.removeItem('dsh.soundAlert.v1');
 - 会话颜色的侧边栏行染色暂未实现：侧边栏会话行没有公开的 per-row 槽、
   DOM 上也没有 `data-session-id`，需上游在 `dsh-client-ui-workspace` 暴露
   （加 `data-session-id` 属性或 `session.row` 槽）；当前颜色入口在会话头部
+- 工作区文件树仅显示目录层级（宿主 `listDirectory` 不返回文件）；显示文件
+  需上游扩展
 - 颜色和音效设置存于浏览器 `localStorage`，不跨设备同步
 
 ## License
