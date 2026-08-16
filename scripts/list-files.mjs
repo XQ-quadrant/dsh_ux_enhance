@@ -11,7 +11,7 @@
  * The script prints a JSON tree to stdout. It skips common heavy/hidden
  * directories (node_modules, .git, dist, build) and hidden entries.
  */
-import { readdir, writeFile } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 const target = path.resolve(process.argv[2] || process.cwd());
@@ -55,10 +55,4 @@ async function walk(dir, depth) {
 
 const tree = await walk(target, 0);
 process.stdout.write(JSON.stringify(tree, null, 2) + "\n");
-
-// Also write the JSON beside the browser entry so the plugin UI can fetch it
-// when the DSH Host does not provide a file-browse API.
-const outputUrl = new URL("../lib/workspace-tree.json", import.meta.url);
-await writeFile(outputUrl, JSON.stringify(tree, null, 2) + "\n", "utf8");
-console.error(`wrote ${outputUrl.pathname}`);
 

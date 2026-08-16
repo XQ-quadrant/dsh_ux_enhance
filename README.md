@@ -46,10 +46,13 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 
 - 宿主半 `lib/index.js`：空 `apply`，仅让本包成为 cordis Loader 条目，供
   `dsh-client-modules` 的 node 半扫描 `dsh.client` 声明并下发浏览器半。
-- 浏览器半 `lib/client.js`：注册为懒加载工厂包。它用 MutationObserver 监听
-  会话行「⋯」菜单弹出，向其中注入「设置颜色」；点击后用 `react-dom/client`
-  渲染一个自绘色板弹层；颜色写入 `localStorage` 后给对应行上背景色。
-- 音效模块订阅 `ctx.sessions.list`，对每个会话做状态 diff，只对**状态跳变**发声。
+- 浏览器半 `lib/client.js`：注册为懒加载工厂包。会话颜色走官方扩展面：
+  `ctx.slots.register` 把色板入口注册进会话头部动作槽（`conversation.session.header.actions`），
+  颜色存于框架管理的 `defineStore({ persist })` 会话级 store；会话 id 由框架作为
+  prop 直接传入，不再靠 DOM 文本反查。
+- 音效模块订阅 `ctx.sessions.list`，对每个会话做状态 diff，只对**状态跳变**发声；
+  开关/音量由框架 store 持久化（`dsh.soundAlert.v1`）。
+- 布局/移动端适配仍为样式层注入（依赖构建期哈希类名，见「已知限制」）。
 
 ## 目录结构
 
@@ -102,25 +105,28 @@ dsh_ux_enhance/
 
 ## 音效配置（可选）
 
-声音开关/音量存在 `localStorage` 的 `dsh.soundAlert.v1`：
+声音开关/音量由框架 store 持久化在 `localStorage` 的 `dsh.soundAlert.v1`
+（默认 `{ enabled: true, volume: 0.15 }`）。控制台直接写该键仍有效，
+但 store 只在页面加载时重新读取，改动需刷新页面后生效：
 
 ```js
-// 完全静音
+// 完全静音（刷新后生效）
 localStorage.setItem('dsh.soundAlert.v1', JSON.stringify({ enabled: false }));
 
-// 调小音量（0 ~ 1，默认 0.15）
+// 调小音量（0 ~ 1，默认 0.15；刷新后生效）
 localStorage.setItem('dsh.soundAlert.v1', JSON.stringify({ volume: 0.08 }));
 
-// 恢复默认
+// 恢复默认（删除该键，下次加载回到默认）
 localStorage.removeItem('dsh.soundAlert.v1');
 ```
 
 ## 已知限制
 
-- 依赖 `dsh-client-ui-workspace` 的 DOM 结构，DSH 升级后可能失效
-- 会话识别用「行文本 ↔ `displayTitle` 最长匹配」，标题重复时可能串行
-- 颜色和音效设置存在 `localStorage`，不跨设备同步
-- UI 优化用到构建期哈希类名（`wSkVaW_*` 等），DSH 升级后可能需要更新
+- 布局优化依赖构建期哈希类名（`wSkVaW_*` 等），DSH 升级后可能需要更新
+- 会话颜色的侧边栏行染色暂未实现：侧边栏会话行没有公开的 per-row 槽、
+  DOM 上也没有 `data-session-id`，需上游在 `dsh-client-ui-workspace` 暴露
+  （加 `data-session-id` 属性或 `session.row` 槽）；当前颜色入口在会话头部
+- 颜色和音效设置存于浏览器 `localStorage`，不跨设备同步
 
 ## License
 
