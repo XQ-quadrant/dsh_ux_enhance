@@ -43,6 +43,9 @@
       "inject": [
         "@deepseek-ai/dsh-client-runtime"
       ]
+    },
+    "bundle": {
+      "hooks": {}
     }
   },
   "dependencies": {}
