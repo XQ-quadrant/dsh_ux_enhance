@@ -1,0 +1,49 @@
+{
+  "name": "dsh_ux_enhance",
+  "version": "0.1.0",
+  "description": "DSH plugin: sidebar session color + layout optimization + sound alerts",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./client/session-color": {
+      "default": "./lib/session-color.js"
+    },
+    "./client/layout-ui": {
+      "default": "./lib/layout-ui.js"
+    },
+    "./client/sound-alert": {
+      "default": "./lib/sound-alert.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "repository": "github:XQ-quadrant/dsh_ux_enhance",
+  "keywords": [
+    "dsh",
+    "deepseek",
+    "sidebar",
+    "session-color",
+    "dsh-plugin",
+    "ux",
+    "enhance"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/XQ-quadrant/dsh_ux_enhance/issues"
+  },
+  "homepage": "https://github.com/XQ-quadrant/dsh_ux_enhance#readme",
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ]
+    }
+  },
+  "dependencies": {}
+}

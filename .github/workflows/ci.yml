@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build bundle
+        run: node scripts/build.mjs
+
+      - name: Verify client.js was generated
+        run: |
+          if [ ! -f lib/client.js ]; then
+            echo "ERROR: lib/client.js was not generated"
+            exit 1
+          fi
+          echo "lib/client.js size: $(wc -c < lib/client.js) bytes"
