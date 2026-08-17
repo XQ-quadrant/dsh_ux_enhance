@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.2.0] - 2026-08-17
 
 ### Changed
 - **会话颜色** — 改用官方扩展面：`ctx.slots.register` 注册进会话头部动作槽

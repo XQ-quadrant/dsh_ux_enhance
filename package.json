@@ -1,7 +1,7 @@
 {
   "name": "dsh_ux_enhance",
-  "version": "0.1.0",
-  "description": "DSH plugin: sidebar session color + layout optimization + sound alerts",
+  "version": "0.2.0",
+  "description": "DSH plugin: session color + layout optimization + sound alerts (slot/store based)",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
