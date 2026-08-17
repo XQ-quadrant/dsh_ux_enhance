@@ -65,12 +65,15 @@ dsh_ux_enhance/
 ├── lib/
 │   ├── index.js          # 宿主半（空 apply）
 │   ├── client.js         # 浏览器半 bundle（由 scripts/build.mjs 生成）
-│   ├── entry.js          # 浏览器端入口，组合三个功能模块
-│   ├── session-color.js  # 功能1：侧边栏会话颜色
-│   ├── layout-ui.js      # 功能2：PC 布局 + 手机适配 + 文件目录面板
-│   └── sound-alert.js    # 功能3：音效提示
+│   ├── entry.js          # 浏览器端入口，组合各功能模块
+│   ├── session-color.js  # 功能1：会话颜色（会话头部动作槽 + 框架 store）
+│   ├── workspace-tree.js # 功能2：工作区目录树（conversation.input.dock + listDirectory）
+│   ├── layout-ui.js      # 功能3：两栏/手机 CSS 皮肤 + 跳底按钮（shell.overlay）
+│   └── sound-alert.js    # 功能4：音效提示
 ├── scripts/
 │   └── build.mjs         # node scripts/build.mjs 生成 lib/client.js
+├── docs/
+│   └── upstream-proposals.md  # 上游 PR 提案
 └── package.json
 ```
 

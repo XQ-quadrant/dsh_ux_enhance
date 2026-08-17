@@ -11,6 +11,7 @@ import { readFile, writeFile } from "node:fs/promises";
 
 const parts = [
 	"lib/session-color.js",
+	"lib/workspace-tree.js",
 	"lib/layout-ui.js",
 	"lib/sound-alert.js",
 	"lib/entry.js"
