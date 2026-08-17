@@ -26,9 +26,10 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 ![手机效果2](手机效果2.png)
 
 ### 3. 会话颜色
-- 会话头部动作槽（`conversation.session.header.actions`）注册色板入口
-- 10 种预设色 + 清除按钮
-- 颜色存入框架 `defineStore({ persist })` 会话级 store，会话删除自动清理
+- 侧边栏会话行「⋯」菜单注入「设置颜色」入口，10 种预设色 + 清除
+- 颜色存入框架根作用域 `defineStore({ persist })` 全局色表（会话 id → 颜色），
+  自动迁移 0.1.0 时代的 `dsh.sessionColor.v1` 旧色
+- 侧边栏行按颜色上浅底色，选中行带彩色左描边
 
 ### 4. 音效提示
 - **完成音**：`running` true → false（每轮对话跑完），上行双音「叮-咚」
@@ -54,10 +55,10 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 宿主半 `lib/index.js`：在 DSH webserver 上注册同源只读路由
   `GET /ux-enhance/tree?path=<cwd>`，递归列出工作区（含文件、有界），
   供浏览器半的文件树取数。
-- 浏览器半 `lib/client.js`：注册为懒加载工厂包。会话颜色走官方扩展面：
-  `ctx.slots.register` 把色板入口注册进会话头部动作槽（`conversation.session.header.actions`），
-  颜色存于框架管理的 `defineStore({ persist })` 会话级 store；会话 id 由框架作为
-  prop 直接传入，不再靠 DOM 文本反查。
+- 浏览器半 `lib/client.js`：注册为懒加载工厂包。会话颜色在侧边栏行「⋯」菜单注入
+  「设置颜色」（弹层为自绘 React 色板），颜色存于框架根作用域
+  `defineStore({ persist })` 色表；行染色读取色表 + `ctx.sessions.list` 做
+  文本反查（DSH 侧边栏暂无 per-row 槽，见「已知限制」）。
 - 音效模块订阅 `ctx.sessions.list`，对每个会话做状态 diff，只对**状态跳变**发声；
   开关/音量由框架 store 持久化（`dsh.soundAlert.v1`）。
 - 跳底按钮注册进 `shell.overlay`（浮层槽），工作区目录树注册进
@@ -72,7 +73,7 @@ dsh_ux_enhance/
 │   ├── index.js          # 宿主半（空 apply）
 │   ├── client.js         # 浏览器半 bundle（由 scripts/build.mjs 生成）
 │   ├── entry.js          # 浏览器端入口，组合各功能模块
-│   ├── session-color.js  # 功能1：会话颜色（会话头部动作槽 + 框架 store）
+│   ├── session-color.js  # 功能1：会话颜色（侧边栏行菜单 + 根作用域框架 store）
 │   ├── workspace-tree.js # 功能2：工作区目录树（conversation.input.dock + listDirectory）
 │   ├── layout-ui.js      # 功能3：两栏/手机 CSS 皮肤 + 跳底按钮（shell.overlay）
 │   └── sound-alert.js    # 功能4：音效提示
@@ -136,11 +137,12 @@ localStorage.removeItem('dsh.soundAlert.v1');
 ## 已知限制
 
 - 布局优化依赖构建期哈希类名（`wSkVaW_*` 等），DSH 升级后可能需要更新
-- 会话颜色的侧边栏行染色暂未实现：侧边栏会话行没有公开的 per-row 槽、
-  DOM 上也没有 `data-session-id`，需上游在 `dsh-client-ui-workspace` 暴露
-  （加 `data-session-id` 属性或 `session.row` 槽）；当前颜色入口在会话头部
-- 工作区文件树仅显示目录层级（宿主 `listDirectory` 不返回文件）；显示文件
-  需上游扩展
+- 会话颜色的侧边栏行 UI 是受控 DOM 缝合层（菜单注入 + 行文本 ↔ `displayTitle`
+  最长匹配反查会话 id）：DSH 侧边栏没有公开的 per-row 槽、行上也没有
+  `data-session-id`；标题重复时可能串行。彻底根治需上游在
+  `dsh-client-ui-workspace` 暴露（见 [docs/upstream-proposals.md](docs/upstream-proposals.md) PR 1）
+- 工作区文件树依赖插件宿主半的同源路由取数（含文件）；宿主原生
+  `listDirectory` 仍不返回文件，上游扩展见 PR 2
 - 颜色和音效设置存于浏览器 `localStorage`，不跨设备同步
 
 > 上述「需上游」的两点已整理成具体的 PR 提案，见
