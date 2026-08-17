@@ -134,6 +134,9 @@ localStorage.removeItem('dsh.soundAlert.v1');
   需上游扩展
 - 颜色和音效设置存于浏览器 `localStorage`，不跨设备同步
 
+> 上述「需上游」的两点已整理成具体的 PR 提案，见
+> [docs/upstream-proposals.md](docs/upstream-proposals.md)。
+
 ## License
 
 MIT © XQ-quadrant
