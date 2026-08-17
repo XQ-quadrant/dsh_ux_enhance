@@ -37,17 +37,23 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 可通过 `localStorage` 开关或调节音量（`dsh.soundAlert.v1`）
 
 ### 5. 工作区文件目录面板
-- `conversation.input.dock` 槽组件，数据来自官方 `ctx.workspaces.listDirectory`
-- 懒加载展开目录，行内「打开」调用 `openPath` 在系统文件管理器中打开
+- `conversation.input.dock` 槽组件；数据优先来自插件宿主半的同源路由
+  `/ux-enhance/tree`（**含文件**、限深 5 层、跳过重目录），路由不可用时回退
+  官方 `ctx.workspaces.listDirectory`（仅目录）
+- **单击 / 右键**：复制相对路径（以工作区根为基准），行尾闪现「✓ 已复制」
+- **双击**：目录展开/收起，文件用系统默认应用打开
+- 行内「打开」按钮：在系统文件管理器中打开该文件/目录
 - 手机端自动隐藏，不干扰主流程
-- 注：宿主 `listDirectory` 只返回目录（浏览能力跳过文件），因此这是目录树
+- 注：原生 `listDirectory` 只返回目录；「含文件」目前靠宿主半 shim 实现，
+  上游方案见 `docs/upstream-proposals.md` PR 2
 
 ---
 
 ## 工作原理
 
-- 宿主半 `lib/index.js`：空 `apply`，仅让本包成为 cordis Loader 条目，供
-  `dsh-client-modules` 的 node 半扫描 `dsh.client` 声明并下发浏览器半。
+- 宿主半 `lib/index.js`：在 DSH webserver 上注册同源只读路由
+  `GET /ux-enhance/tree?path=<cwd>`，递归列出工作区（含文件、有界），
+  供浏览器半的文件树取数。
 - 浏览器半 `lib/client.js`：注册为懒加载工厂包。会话颜色走官方扩展面：
   `ctx.slots.register` 把色板入口注册进会话头部动作槽（`conversation.session.header.actions`），
   颜色存于框架管理的 `defineStore({ persist })` 会话级 store；会话 id 由框架作为
