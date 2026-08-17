@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-08-17
+
+### Added
+- **工作区文件树（含文件）** — 宿主半在 DSH webserver 上注册同源只读路由
+  `GET /ux-enhance/tree?path=<cwd>`（递归含文件、限深 5 层、每目录 200 项、
+  总量 3000 节点、跳过 `node_modules/.git/dist/__pycache__` 等、拒绝 `..`）；
+  路由不可用时回退官方 `ctx.workspaces.listDirectory`（仅目录）
+- **手机版文件树 tab** — ≤767px 时文件树以会话头部 tab「文件」出现
+  （`conversation.view` 视图，与「对话/轨迹」同级），桌面不显示
+- **树交互** — 单击：目录展开/收起 + 复制相对路径（手机轻点同样生效）；
+  双击：系统文件管理器/默认应用打开；右键：复制相对路径；回车/空格同单击；
+  复制后行尾闪现「✓ 已复制」
+
+### Changed
+- **会话颜色恢复侧边栏行配置** — 颜色存根作用域 `defineStore({ persist })`
+  映射并一次性迁移旧 `dsh.sessionColor.v1`（已有颜色保留）；painting 订阅
+  store + `ctx.sessions.list` 响应式刷新
+- **桌面两栏布局** — 文件树位于右栏顶部（随右栏高度伸展）；输入框默认高度
+  180px→220px；输入卡（含两行 token 统计）`flex-shrink:0` 不被压缩
+- **host 半** — 从 no-op 恢复为工作区树服务（同源路由，无额外端口/CORS）
+
+### Removed
+- 临时诊断日志（保留 `[ux-enhance] apply` 启动日志与路由回退警告各一条）
+
+### Known Limitations
+- 布局优化依赖构建期哈希类名（`wSkVaW_*` 等），DSH 升级后可能需要更新
+- 「含文件」目前靠宿主半 shim；原生 `listDirectory` 只返回目录，上游方案见
+  `docs/upstream-proposals.md` PR 2
+- 会话颜色的行级动作仍无公开槽（上游 PR 1）
+
 ## [0.2.0] - 2026-08-17
 
 ### Changed

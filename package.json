@@ -1,6 +1,6 @@
 {
   "name": "dsh_ux_enhance",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "DSH plugin: session color + layout optimization + sound alerts (slot/store based)",
   "type": "module",
   "main": "lib/index.js",
