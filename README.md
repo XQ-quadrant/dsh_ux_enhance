@@ -38,13 +38,15 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 可通过 `localStorage` 开关或调节音量（`dsh.soundAlert.v1`）
 
 ### 5. 工作区文件目录面板
-- `conversation.input.dock` 槽组件；数据优先来自插件宿主半的同源路由
-  `/ux-enhance/tree`（**含文件**、限深 5 层、跳过重目录），路由不可用时回退
-  官方 `ctx.workspaces.listDirectory`（仅目录）
+- 桌面两栏：`conversation.input.dock` 槽组件，**位于右栏顶部**（输入框上方，
+  随右栏高度伸展）；数据优先来自插件宿主半的同源路由 `/ux-enhance/tree`
+  （**含文件**、限深 5 层、跳过重目录），路由不可用时回退官方
+  `ctx.workspaces.listDirectory`（仅目录）
+- 手机版（≤767px）：以**会话头部 tab「文件」**形式出现（与「对话/轨迹」同级的
+  `conversation.view` 视图），全区域显示文件树；桌面不显示该 tab
 - **单击 / 右键**：复制相对路径（以工作区根为基准），行尾闪现「✓ 已复制」
 - **双击**：目录展开/收起，文件用系统默认应用打开
 - 行内「打开」按钮：在系统文件管理器中打开该文件/目录
-- 手机端自动隐藏，不干扰主流程
 - 注：原生 `listDirectory` 只返回目录；「含文件」目前靠宿主半 shim 实现，
   上游方案见 `docs/upstream-proposals.md` PR 2
 
