@@ -3,7 +3,8 @@
 [![CI](https://github.com/XQ-quadrant/dsh_ux_enhance/actions/workflows/ci.yml/badge.svg)](https://github.com/XQ-quadrant/dsh_ux_enhance/actions)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
+DSH 会话界面增强插件，不改 DSH 核心：浏览器半走官方槽位/服务扩展界面，
+宿主半提供同源工作区文件树路由。
 
 ---
 
@@ -13,7 +14,7 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 加宽消息列（748px → 900px）
 - 改为左右两栏布局：左侧消息流，右侧输入框 + 统计区
 - 悬浮「跳到底部」按钮（`shell.overlay` 浮层槽），不丢上下文
-- 工作区文件目录面板（`conversation.input.dock` 槽，输入框上方）
+- 工作区文件目录面板（`conversation.input.dock` 槽，右栏顶部）
 
 ![PC效果](PC效果.png)
 
@@ -21,6 +22,7 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - ≤767px 自动回退为原生单栏布局
 - 通过 `--dshsc-mobile-*` CSS 变量缩小字号、收紧间距
 - 保证手机端核心操作流畅
+- 文件树以会话头部「文件」tab 提供（见功能 5）
 
 ![手机效果1](手机效果1.png)
 ![手机效果2](手机效果2.png)
@@ -66,7 +68,8 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 - 音效模块订阅 `ctx.sessions.list`，对每个会话做状态 diff，只对**状态跳变**发声；
   开关/音量由框架 store 持久化（`dsh.soundAlert.v1`）。
 - 跳底按钮注册进 `shell.overlay`（浮层槽），工作区目录树注册进
-  `conversation.input.dock`（数据走 `ctx.workspaces.listDirectory`）。
+  `conversation.input.dock`（数据优先走宿主半 `/ux-enhance/tree` 路由，
+  失败回退 `ctx.workspaces.listDirectory`；手机端另注册「文件」视图 tab）。
 - 两栏布局/手机适配仍为样式层注入（依赖构建期哈希类名，见「已知限制」）。
 
 ## 目录结构
@@ -74,11 +77,11 @@ DSH 会话界面增强插件，不改 DSH 核心，纯客户端注入。
 ```
 dsh_ux_enhance/
 ├── lib/
-│   ├── index.js          # 宿主半（空 apply）
+│   ├── index.js          # 宿主半（同源路由 /ux-enhance/tree：含文件的工作区树）
 │   ├── client.js         # 浏览器半 bundle（由 scripts/build.mjs 生成）
 │   ├── entry.js          # 浏览器端入口，组合各功能模块
 │   ├── session-color.js  # 功能1：会话颜色（侧边栏行菜单 + 根作用域框架 store）
-│   ├── workspace-tree.js # 功能2：工作区目录树（conversation.input.dock + listDirectory）
+│   ├── workspace-tree.js # 功能2：工作区目录树（dock 面板 + 手机「文件」tab，宿主路由取数）
 │   ├── layout-ui.js      # 功能3：两栏/手机 CSS 皮肤 + 跳底按钮（shell.overlay）
 │   └── sound-alert.js    # 功能4：音效提示
 ├── scripts/
@@ -120,6 +123,19 @@ dsh_ux_enhance/
    ```
 
 4. 重启 DSH web（插件集合的变化在重启后生效）。
+
+> 可选：Windows 上目录选择器默认走系统对话框（native），`listDirectory`
+> 回退路径不可用（文件树主路径走宿主路由，不受影响）。如需应用内目录浏览，
+> 在 `cordis.patch.yml` 追加并禁用 auto 行：
+> ```yaml
+> - id: directory-picker
+>   disabled: true
+> - insert:
+>     - id: directory-picker-browse
+>       name: '@deepseek-ai/dsh-host-directory-picker-browse'
+>     - id: ui-directory-picker-browse
+>       name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
+> ```
 
 ## 音效配置（可选）
 
